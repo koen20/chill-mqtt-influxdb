@@ -1,3 +1,6 @@
+import json
+import time
+
 import paho.mqtt.client as mqtt
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -14,6 +17,7 @@ def on_connect(client, userdata, flags, rc):
 
     client.subscribe("sensors/trilsensor")
     client.subscribe("Temperatuur")
+    client.subscribe("#")
 
 
 def on_message(client, userdata, msg):
@@ -25,6 +29,21 @@ def on_message(client, userdata, msg):
         message_split = message.split(';')
         p = Point("measurement").tag("sensor", "tril").tag("component", 1).field("x", float(message_split[0])).field("y", float(message_split[1])).field("z", float(message_split[2]))
         write_api.write(bucket='sensors', record=p)
+    else:
+        entry = {'time': time.time(), 'data': message}
+        fname = "data.json"
+        a = []
+        if not os.path.isfile(fname):
+            a.append(entry)
+            with open(fname, mode='w') as f:
+                f.write(json.dumps(a, indent=2))
+        else:
+            with open(fname) as feedsjson:
+                feeds = json.load(feedsjson)
+
+            feeds.append(entry)
+            with open(fname, mode='w') as f:
+                f.write(json.dumps(feeds, indent=2))
 
 
 client.on_connect = on_connect
