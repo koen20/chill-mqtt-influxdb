@@ -6,7 +6,7 @@ import os
 client = mqtt.Client()
 influxClient = InfluxDBClient(url=os.environ.get('influx_url'),
                               token=os.environ.get('influx_token'),
-                              org=os.environ.get('chill'))
+                              org=os.environ.get('influx_org'))
 
 
 def on_connect(client, userdata, flags, rc):
