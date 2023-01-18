@@ -29,6 +29,10 @@ def on_message(client, userdata, msg):
         message_split = message.split(';')
         p = Point("measurement").tag("sensor", "tril").tag("component", 1).field("x", float(message_split[0])).field("y", float(message_split[1])).field("z", float(message_split[2]))
         write_api.write(bucket='sensors', record=p)
+    elif msg.topic == 'sensors/trilsensor/test':
+        message_split = message.split(';')
+        p = Point("measurement").tag("sensor", "triltest").tag("component", 1).field("temperature", float(message))
+        write_api.write(bucket='sensors', record=p)
     else:
         entry = {'time': time.time(), 'data': message}
         fname = "data.json"
